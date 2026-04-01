@@ -121,7 +121,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -135,3 +135,4 @@ GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 
 # Hugging Face API Token (for free alternative)
 HUGGINGFACE_API_TOKEN = os.getenv('HUGGINGFACE_API_TOKEN')
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
