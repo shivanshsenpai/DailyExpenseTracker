@@ -11,7 +11,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from .models import UserDetail
 from .models import Expense
 
-import pytesseract
+
 from PIL import Image
 from pdf2image import convert_from_bytes
 import pandas as pd
