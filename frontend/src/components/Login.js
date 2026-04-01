@@ -17,26 +17,34 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await fetch("/login/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/login/`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
 
-      if (response.status === 200) {
+      console.log("Login response:", data);
+
+      if (response.ok) {
         toast.success("Login successful!");
-        localStorage.setItem("userId", data.userId);
-        localStorage.setItem("userName", data.userName);
+
+        localStorage.setItem("userId", data?.userId);
+        localStorage.setItem("userName", data?.userName);
+
         setTimeout(() => navigate("/dashboard"), 2000);
       } else {
-        toast.error(data.message);
+        toast.error(data?.message || "Invalid credentials");
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Something went wrong");
+      console.error("Login error:", error);
+      toast.error("Network error. Please try again.");
     }
   };
 
@@ -50,7 +58,7 @@ const Login = () => {
         overflow: "hidden",
       }}
     >
-      {/* 🔥 Floating yellow glow */}
+      {/* Glow effects */}
       <div
         style={{
           position: "absolute",
@@ -62,7 +70,7 @@ const Login = () => {
           left: "10%",
           animation: "float 6s ease-in-out infinite",
         }}
-      ></div>
+      />
 
       <div
         style={{
@@ -75,12 +83,11 @@ const Login = () => {
           right: "10%",
           animation: "float 8s ease-in-out infinite",
         }}
-      ></div>
+      />
 
       <div className="container position-relative">
         <div className="row justify-content-center">
           <div className="col-lg-5 col-md-7">
-            {/* Glass Card */}
             <div
               className="p-4"
               style={{
@@ -92,61 +99,46 @@ const Login = () => {
                 boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
               }}
             >
-              {/* Header */}
               <div className="text-center mb-4">
-                <h3 className="fw-bold text-white">
-                  <i
-                    className="fas fa-sign-in-alt me-2"
-                    style={{ color: "#facc15" }}
-                  ></i>
-                  Welcome Back
-                </h3>
+                <h3 className="fw-bold text-white">Welcome Back</h3>
                 <small style={{ color: "#aaa" }}>Login to continue</small>
               </div>
 
-              {/* Form */}
               <form onSubmit={handleSubmit}>
                 {/* Email */}
-                <div className="mb-3">
-                  <label className="text-light mb-1">Email</label>
-                  <input
-                    type="email"
-                    name="Email"
-                    value={formData.Email}
-                    onChange={handleChange}
-                    className="form-control"
-                    style={{
-                      borderRadius: "12px",
-                      background: "rgba(255,255,255,0.08)",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      color: "#fff",
-                    }}
-                    placeholder="Enter your email"
-                    required
-                  />
-                </div>
+                <input
+                  type="email"
+                  name="Email"
+                  value={formData.Email}
+                  onChange={handleChange}
+                  className="form-control mb-3"
+                  placeholder="Enter your email"
+                  style={{
+                    borderRadius: "12px",
+                    background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    color: "#fff",
+                  }}
+                  required
+                />
 
                 {/* Password */}
-                <div className="mb-4">
-                  <label className="text-light mb-1">Password</label>
-                  <input
-                    type="password"
-                    name="Password"
-                    value={formData.Password}
-                    onChange={handleChange}
-                    className="form-control"
-                    style={{
-                      borderRadius: "12px",
-                      background: "rgba(255,255,255,0.08)",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      color: "#fff",
-                    }}
-                    placeholder="Enter your password"
-                    required
-                  />
-                </div>
+                <input
+                  type="password"
+                  name="Password"
+                  value={formData.Password}
+                  onChange={handleChange}
+                  className="form-control mb-4"
+                  placeholder="Enter your password"
+                  style={{
+                    borderRadius: "12px",
+                    background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    color: "#fff",
+                  }}
+                  required
+                />
 
-                {/* Button */}
                 <button
                   type="submit"
                   className="btn w-100 fw-bold"
@@ -155,25 +147,14 @@ const Login = () => {
                     padding: "12px",
                     background: "#facc15",
                     color: "#000",
-                    transition: "0.3s",
                   }}
-                  onMouseEnter={(e) =>
-                    (e.target.style.transform = "scale(1.05)")
-                  }
-                  onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
                 >
                   Sign In
                 </button>
               </form>
 
-              {/* Footer */}
               <div className="text-center mt-3">
-                <p className="mb-1 text-light">Don’t have an account?</p>
-                <Link
-                  to="/signup"
-                  className="fw-bold text-decoration-none"
-                  style={{ color: "#facc15" }}
-                >
+                <Link to="/signup" style={{ color: "#facc15" }}>
                   Create One
                 </Link>
               </div>
@@ -182,7 +163,7 @@ const Login = () => {
         </div>
       </div>
 
-      {/* 🔥 Animations */}
+      {/* Animations */}
       <style>
         {`
           @keyframes gradientMove {
