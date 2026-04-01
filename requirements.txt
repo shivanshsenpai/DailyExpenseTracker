@@ -1,0 +1,4 @@
+Django==5.2.12
+requests==2.31.0
+djangorestframework==3.14.0</content>
+<parameter name="filePath">w:\DailyExpenseTracker\requirements.txt
