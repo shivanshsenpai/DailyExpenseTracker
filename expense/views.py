@@ -1,16 +1,16 @@
-import datetime
+
 import traceback
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-
+import datetime
 from yahoo_fin.stock_info import get_quote_table, tickers_nifty50
 import json
 import requests
 from django.contrib.auth.hashers import make_password, check_password
 from .models import UserDetail
 from .models import Expense
-from datetime import datetime
+
 import pytesseract
 from PIL import Image
 from pdf2image import convert_from_bytes
@@ -365,12 +365,23 @@ def upload_statement(request):
                 print(df.head())
 
                 transactions = []
-
                 for _, row in df.iterrows():
+                    print("ROW:", row.to_dict())
+
+                    description = row.get("Item", "")
+                    amount = row.get("Amount", 0)
+                    date = row.get("Date", "")
+
+    # SAFE amount
+                    try:
+                        amount = float(amount)
+                    except:
+                        amount = 0
+
                     transactions.append({
-                        "description": str(row.get("Item", "")).strip(),
-                        "amount": float(row.get("Amount", 0)),
-                        "date": convert_date(str(row.get("Date", "")))
+                        "description": str(description).strip(),
+                        "amount": amount,
+                        "date": convert_date(date)  # 🔥 pass raw, not str
                     })
 
                 print("✅ PARSED TRANSACTIONS:", transactions)
@@ -422,17 +433,29 @@ def parse_transactions(text):
 
         return transactions
        
+def convert_date(date_val):
+    try:
+        date_str = str(date_val).strip()
 
-def convert_date(date_str):
-        try:
-            return datetime.strptime(date_str, "%d-%m-%Y").strftime("%Y-%m-%d")
-        except:
-            return datetime.today().strftime("%Y-%m-%d")
+        if not date_str or date_str.lower() == "nan":
+            return datetime.date.today().strftime("%Y-%m-%d")
+
+        for fmt in ("%d-%m-%Y", "%Y-%m-%d", "%d/%m/%Y"):
+            try:
+                return datetime.datetime.strptime(date_str, fmt).strftime("%Y-%m-%d")
+            except:
+                continue
+
+        print("❌ DATE FAILED:", date_str)
+        return datetime.date.today().strftime("%Y-%m-%d")
+
+    except Exception as e:
+        print("❌ HARD DATE ERROR:", date_val, str(e))
+        return datetime.date.today().strftime("%Y-%m-%d")
     
     #bulk upload endpoint#
 @csrf_exempt
 def add_multiple_expenses(request):
-   
     try:
         if request.method != "POST":
             return JsonResponse({"error": "Only POST allowed"}, status=405)
@@ -442,11 +465,25 @@ def add_multiple_expenses(request):
         print("📥 RECEIVED DATA:", data)
 
         for item in data:
+            user_id = item.get("UserId") or item.get("UserID") or item.get("UserID_id")
+
+            if not user_id:
+                return JsonResponse({
+                    "error": "UserId missing in one of the items"
+                }, status=400)
+
+            # ✅ SAFE DATE
+            expense_date = item.get("NoteDate")
+            try:
+                expense_date = datetime.strptime(expense_date, "%Y-%m-%d").date()
+            except:
+                expense_date = datetime.today().date()
+
             Expense.objects.create(
-                ExpenseItem=item.get("ExpenseItem"),
-                ExpenseCost=str(item.get("ExpenseCost")),  # ensure string
-                ExpenseDate=item.get("NoteDate"),  # 🔥 map to ExpenseDate
-                UserID_id=item.get("UserId")  # 🔥 IMPORTANT
+                ExpenseItem=item.get("ExpenseItem", "").strip(),
+                ExpenseCost=str(item.get("ExpenseCost", "0")),
+                ExpenseDate=expense_date,
+                UserID_id=user_id
             )
 
         return JsonResponse({"message": "All expenses added successfully"})
@@ -458,7 +495,6 @@ def add_multiple_expenses(request):
             "details": str(e),
             "trace": traceback.format_exc()
         }, status=500)
-    
 
 
 
