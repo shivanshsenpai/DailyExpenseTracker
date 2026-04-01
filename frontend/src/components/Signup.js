@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate, Link } from "react-router-dom";
+// const BASE_URL = "http://127.0.0.1:8000";
+const BASE_URL = "https://dailyexpensetracker-production-1754.up.railway.app";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -17,8 +19,9 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/signup/`, {
+      const response = await fetch(`${BASE_URL}/signup/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -29,7 +32,7 @@ const Signup = () => {
         setTimeout(() => navigate("/login"), 2000);
       } else {
         const data = await response.json();
-        toast.error(data.message);
+        toast.error(data.message || "Signup failed");
       }
     } catch (error) {
       console.error(error);
@@ -47,7 +50,7 @@ const Signup = () => {
         overflow: "hidden",
       }}
     >
-      {/* 🌫️ Floating glow */}
+      {/* Glow */}
       <div
         style={{
           position: "absolute",
@@ -59,7 +62,7 @@ const Signup = () => {
           left: "10%",
           animation: "float 7s ease-in-out infinite",
         }}
-      ></div>
+      />
 
       <div
         style={{
@@ -72,12 +75,11 @@ const Signup = () => {
           right: "10%",
           animation: "float 9s ease-in-out infinite",
         }}
-      ></div>
+      />
 
       <div className="container position-relative">
         <div className="row justify-content-center">
           <div className="col-lg-5 col-md-7">
-            {/* Glass Card */}
             <div
               className="p-4"
               style={{
@@ -89,87 +91,47 @@ const Signup = () => {
                 boxShadow: "0 8px 30px rgba(0,0,0,0.5)",
               }}
             >
-              {/* Header */}
               <div className="text-center mb-4">
-                <h3 className="fw-bold text-white">
-                  <i
-                    className="fas fa-user-plus me-2"
-                    style={{ color: "#facc15" }}
-                  ></i>
-                  Create Account
-                </h3>
+                <h3 className="fw-bold text-white">Create Account</h3>
                 <small style={{ color: "#aaa" }}>
                   Start managing your expenses
                 </small>
               </div>
 
-              {/* Form */}
               <form onSubmit={handleSubmit}>
-                {/* Name */}
-                <div className="mb-3">
-                  <label className="text-light mb-1">Full Name</label>
-                  <input
-                    type="text"
-                    name="FullName"
-                    value={formData.FullName}
-                    onChange={handleChange}
-                    className="form-control"
-                    style={{
-                      borderRadius: "12px",
-                      background: "rgba(255,255,255,0.08)",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      color: "#fff",
-                    }}
-                    placeholder="Enter your name"
-                    required
-                  />
-                </div>
+                {/* Full Name */}
+                <input
+                  type="text"
+                  name="FullName"
+                  value={formData.FullName}
+                  onChange={handleChange}
+                  className="form-control mb-3 custom-input"
+                  placeholder="Enter your name"
+                  required
+                />
 
                 {/* Email */}
-                <div className="mb-3">
-                  <label className="text-light mb-1">Email</label>
-                  <input
-                    type="email"
-                    name="Email"
-                    value={formData.Email}
-                    onChange={handleChange}
-                    className="form-control"
-                    style={{
-                      borderRadius: "12px",
-                      background: "rgba(255,255,255,0.08)",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      color: "#fff",
-                      palceholder: "rgba(255,255,255,0.5)",
-                    }}
-                    placeholder="Enter your email"
-                    required
-                  />
-                </div>
+                <input
+                  type="email"
+                  name="Email"
+                  value={formData.Email}
+                  onChange={handleChange}
+                  className="form-control mb-3 custom-input"
+                  placeholder="Enter your email"
+                  required
+                />
 
                 {/* Password */}
-                <div className="mb-4">
-                  <label className="text-light mb-1">Password</label>
-                  <input
-                    type="password"
-                    name="Password"
-                    value={formData.Password}
-                    onChange={handleChange}
-                    className="form-control"
-                    style={{
-                      borderRadius: "12px",
-                      background: "rgba(255,255,255,0.08)",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      color: "#fff",
-                      placeholder: "rgba(255,255,255,0.5)",
-                    }}
-                    //can you write a code to make place holder text light white
+                <input
+                  type="password"
+                  name="Password"
+                  value={formData.Password}
+                  onChange={handleChange}
+                  className="form-control mb-4 custom-input"
+                  placeholder="Create password"
+                  required
+                />
 
-                    placeholder="Create password"
-                    required
-                  />
-                </div>
-
-                {/* Button */}
                 <button
                   type="submit"
                   className="btn w-100 fw-bold"
@@ -178,25 +140,15 @@ const Signup = () => {
                     padding: "12px",
                     background: "#facc15",
                     color: "#000",
-                    transition: "0.3s",
                   }}
-                  onMouseEnter={(e) =>
-                    (e.target.style.transform = "scale(1.05)")
-                  }
-                  onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
                 >
                   Create Account
                 </button>
               </form>
 
-              {/* Footer */}
               <div className="text-center mt-3">
-                <p className="mb-1 text-light">Already have an account?</p>
-                <Link
-                  to="/login"
-                  className="fw-bold text-decoration-none"
-                  style={{ color: "#facc15" }}
-                >
+                <p className="text-light mb-1">Already have an account?</p>
+                <Link to="/login" style={{ color: "#facc15" }}>
                   Sign In
                 </Link>
               </div>
@@ -205,9 +157,27 @@ const Signup = () => {
         </div>
       </div>
 
-      {/* ✨ Animations */}
+      {/* Styles */}
       <style>
         {`
+          .custom-input {
+            border-radius: 12px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+          }
+
+          .custom-input::placeholder {
+            color: rgba(255,255,255,0.6);
+          }
+
+          .custom-input:focus {
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            border-color: #facc15;
+            box-shadow: none;
+          }
+
           @keyframes gradientMove {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
