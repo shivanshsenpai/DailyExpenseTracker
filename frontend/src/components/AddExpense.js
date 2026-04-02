@@ -351,7 +351,17 @@ const AddExpense = () => {
       ),
     });
 
-    const data = await response.json();
+    const text = await response.text();
+  console.log("RAW RESPONSE:", text);
+
+  let data;
+  try {
+  data = JSON.parse(text);
+  } catch (e) {
+    console.error("❌ Not JSON:", text);
+    toast.error("Server returned invalid response");
+    return;
+  }
 
     console.log("SAVE RESPONSE:", data);
 
