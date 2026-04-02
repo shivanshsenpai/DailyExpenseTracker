@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-// const BASE_URL = "http://127.0.0.1:8000";
-const BASE_URL = "https://dailyexpensetracker-production-1754.up.railway.app";
+
 const getLocalDate = () => {
   const d = new Date();
   const tzOffset = d.getTimezoneOffset() * 60000;
@@ -186,7 +185,7 @@ const AddExpense = () => {
     async (transcript) => {
       try {
         const prompt = `Parse the following expense description into JSON format: "${transcript}". Extract: item (string), cost (number), date (YYYY-MM-DD). If date is not mentioned, use today's date. If cost is not mentioned, set to 0. Return only valid JSON.`;
-        const res = await fetch(`${BASE_URL}/ai_chat/${userId}/`, {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/ai_chat/${userId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: prompt }),
@@ -313,7 +312,7 @@ const AddExpense = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${BASE_URL}/add_expense/`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/add_expense/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -337,7 +336,7 @@ const AddExpense = () => {
   };
   const saveAllExpenses = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/add_multiple_expenses/`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/add_multiple_expenses/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -374,7 +373,7 @@ const AddExpense = () => {
   formData.append("file", file);
 
   try {
-    const res = await fetch(`${BASE_URL}/upload-statement/`, {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/upload-statement/`, {
       method: "POST",
       body: formData,
     });
@@ -760,4 +759,3 @@ const AddExpense = () => {
 };
 
 export default AddExpense;
-

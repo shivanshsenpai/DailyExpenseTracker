@@ -155,7 +155,7 @@ const AIChat = () => {
   };
   const addExpense = async (expense) => {
     try {
-      const res = await fetch('/add_expense/', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/add_expense/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -202,7 +202,7 @@ const AIChat = () => {
     setLoading(true);
 
     try {
-      const res = await fetch(`/ai_chat/${userId}/`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/ai_chat/${userId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input }),

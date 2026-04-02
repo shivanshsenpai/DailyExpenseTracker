@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, Link } from "react-router-dom";
-const BASE_URL = "https://dailyexpensetracker-production-1754.up.railway.app";
-// const BASE_URL = "http://127.0.0.1:8000";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -18,35 +16,38 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const response = await fetch(`${BASE_URL}/login/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/login/`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
-    const data = await response.json();
+      const data = await response.json().catch(() => null);
 
-    if (response.ok) {
-      toast.success("Login successful!");
+      console.log("Login response:", data);
 
-      localStorage.setItem("userId", data.userId);
-      localStorage.setItem("userName", data.userName);
+      if (response.ok) {
+        toast.success("Login successful!");
 
-      setTimeout(() => navigate("/dashboard"), 1500);
-    } else {
-      toast.error(data.message || "Login failed");
+        localStorage.setItem("userId", data?.userId);
+        localStorage.setItem("userName", data?.userName);
+
+        setTimeout(() => navigate("/dashboard"), 2000);
+      } else {
+        toast.error(data?.message || "Invalid credentials");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Network error. Please try again.");
     }
-  } catch (error) {
-    console.error("Login error:", error);
-    toast.error("Server not reachable");
-  }
-};
-console.log("BASE_URL =", BASE_URL);
+  };
+
   return (
     <div
       className="min-vh-100 d-flex align-items-center justify-content-center position-relative"
@@ -83,7 +84,6 @@ console.log("BASE_URL =", BASE_URL);
           animation: "float 8s ease-in-out infinite",
         }}
       />
-  
 
       <div className="container position-relative">
         <div className="row justify-content-center">
