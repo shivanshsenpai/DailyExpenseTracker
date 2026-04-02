@@ -11,6 +11,7 @@ import ChangePassword from "./components/ChangePassword";
 import AIChat from "./components/AIChat";
 import AISuggestions from "./components/AISuggestions";
 import StockUpdates from "./components/StockUpdates";
+import AdminDashboard from "./components/AdminDashboard";
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
           <Route path="/ai-chat" element={<AIChat />}></Route>
           <Route path="/ai-suggestions" element={<AISuggestions />}></Route>
           <Route path="/stock-update" element={<StockUpdates/>}></Route>
+          <Route path="/admin-dashboard" element={<AdminDashboard />}></Route>
           
         </Routes>
       </BrowserRouter>

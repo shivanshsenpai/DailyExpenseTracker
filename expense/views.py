@@ -36,7 +36,6 @@ def signup(request):
         UserDetail.objects.create(FullName=fullname, Email=email, Password=make_password(password))
         return JsonResponse({'message': 'Welcome you are now registered'}, status=201)
 
-
 @csrf_exempt
 def login(request):
     if request.method == 'POST':
@@ -46,28 +45,65 @@ def login(request):
 
         try:
             user = UserDetail.objects.get(Email=email)
+
+            # ✅ Hashed password check
             if check_password(password, user.Password):
                 return JsonResponse({
                     'message': 'Login Successful',
                     'userId': user.id,
-                    'userName': user.FullName
+                    'userName': user.FullName,
+                    'isAdmin': user.is_admin   # 🔥 ADD THIS
                 }, status=200)
 
-            # Legacy fallback for plaintext stored passwords (migrated users)
+            # ✅ Legacy plaintext fallback
             if user.Password == password:
                 user.Password = make_password(password)
                 user.save(update_fields=['Password'])
+
                 return JsonResponse({
                     'message': 'Login Successful',
                     'userId': user.id,
-                    'userName': user.FullName
+                    'userName': user.FullName,
+                    'isAdmin': user.is_admin   # 🔥 ADD HERE ALSO
                 }, status=200)
 
             return JsonResponse({'message': 'Invalid Credentials'}, status=400)
+
         except UserDetail.DoesNotExist:
             return JsonResponse({'message': 'Invalid Credentials'}, status=400)
+#admin login 
+@csrf_exempt
+def admin_data(request):
+    try:
+        user_id = request.GET.get("userId")
 
+        if not user_id:
+            return JsonResponse({"error": "UserId required"}, status=400)
 
+        user = UserDetail.objects.get(id=user_id)
+
+        # 🔒 STRICT ADMIN CHECK
+        if not user.is_admin:
+            return JsonResponse({"error": "Unauthorized"}, status=403)
+
+        # ❌ NEVER SEND PASSWORDS IN REAL APPS
+        users = list(
+            UserDetail.objects.values("id", "FullName", "Email", "RegDate", "is_admin")
+        )
+
+        expenses = list(
+            Expense.objects.values(
+                "id", "ExpenseItem", "ExpenseCost", "ExpenseDate", "UserID_id"
+            )
+        )
+
+        return JsonResponse({
+            "users": users,
+            "expenses": expenses
+        })
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 # ---------------- EXPENSE CRUD ---------------- #
 
 @csrf_exempt

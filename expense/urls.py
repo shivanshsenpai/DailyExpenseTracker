@@ -13,5 +13,6 @@ urlpatterns = [
     path('upload-statement/', upload_statement, name="upload_statement"),
     path('add_multiple_expenses/', add_multiple_expenses, name="add_multiple_expenses"),
     path('stock-update/',stock_update,name="stock_update"),
+    path('admin-data/', admin_data, name="admin_data"),
     
 ]

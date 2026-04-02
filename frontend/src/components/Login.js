@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
-
+  
   const [formData, setFormData] = useState({
     Email: "",
     Password: "",
@@ -35,10 +35,18 @@ const Login = () => {
       if (response.ok) {
         toast.success("Login successful!");
 
-        localStorage.setItem("userId", data?.userId);
-        localStorage.setItem("userName", data?.userName);
+     localStorage.setItem("userId", data?.userId);
+localStorage.setItem("userName", data?.userName);
+localStorage.setItem("isAdmin", data?.isAdmin ? "true" : "false");
+setTimeout(() => {
+  const isAdmin = data?.isAdmin === true || data?.isAdmin === "true";
 
-        setTimeout(() => navigate("/dashboard"), 2000);
+  if (isAdmin) {
+    navigate("/admin-dashboard");   // 👑 ADMIN
+  } else {
+    navigate("/dashboard");         // 👤 USER
+  }
+}, 1500);
       } else {
         toast.error(data?.message || "Invalid credentials");
       }
