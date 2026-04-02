@@ -33,7 +33,7 @@ const ChangePassword = () => {
     }
 
     try {
-      const response = await fetch(`/change_password/${userId}/`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/change_password/${userId}/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

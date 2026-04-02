@@ -12,7 +12,7 @@ const AISuggestions = () => {
   const fetchSuggestions = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/ai_suggestions/${userId}/`);
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/ai_suggestions/${userId}/`);
       const data = await res.json();
 
       if (res.ok) {

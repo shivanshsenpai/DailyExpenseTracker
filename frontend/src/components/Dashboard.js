@@ -26,7 +26,7 @@ const Dashboard = () => {
 
     const loadExpenses = async () => {
       try {
-        const res = await fetch(`/manage_expense/${userId}/`);
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/expenses/${userId}/`);
         const data = await res.json();
         setExpenses(data);
       } catch (err) {

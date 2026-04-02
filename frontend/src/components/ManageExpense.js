@@ -21,7 +21,7 @@ const ManageExpense = () => {
 
   const fetchExpenses = async (uid) => {
     try {
-      const res = await fetch(`/manage_expense/${uid}/`);
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/expenses/${uid}/`);
       const data = await res.json();
       setExpenses(data);
     } catch {
@@ -32,7 +32,7 @@ const ManageExpense = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this expense?")) return;
     try {
-      await fetch(`/delete_expense/${id}/`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/delete_expense/${id}/`, {
         method: "DELETE",
       });
       toast.success("Deleted");
@@ -49,7 +49,7 @@ const ManageExpense = () => {
 
   const handleUpdate = async () => {
     try {
-      const res = await fetch(`/update_expense/${editExpense.id}/`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/update_expense/${editExpense.id}/`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editExpense),

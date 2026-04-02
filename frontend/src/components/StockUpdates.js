@@ -11,7 +11,7 @@ const StockUpdates = () => {
 
   // Load markets + stocks
   useEffect(() => {
-    fetch(`/stock-update/?market=${market}`)
+    fetch(`${process.env.REACT_APP_API_URL}/stock-update/?market=${market}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.markets) setMarkets(data.markets);
@@ -29,7 +29,7 @@ const StockUpdates = () => {
         .map((s) => `stock_update=${s}`)
         .join("&");
 
-      const res = await fetch(`/stock-update/?market=${market}&${query}`);
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/stock-update/?market=${market}&${query}`);
       const data = await res.json();
 
       if (data.data) setStockData(data.data);
