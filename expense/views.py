@@ -274,6 +274,7 @@ RULES:
 
     return JsonResponse({'message': 'Method not allowed'}, status=405)
 # ---------------- AI CHAT ---------------- #
+
 @csrf_exempt
 def ai_chat(request, user_id):
     if request.method == 'POST':
@@ -288,8 +289,9 @@ def ai_chat(request, user_id):
                 Expense.objects.filter(UserID=user_id)
                 .values('ExpenseItem', 'ExpenseCost', 'ExpenseDate')
             )
+
             total = sum(float(e['ExpenseCost']) for e in expenses)
-            # Format expense data
+
             if expenses:
                 expenses_str = "\n".join([
                     f"- {e['ExpenseItem']}: ₹{e['ExpenseCost']} on {e['ExpenseDate']}"
@@ -298,46 +300,61 @@ def ai_chat(request, user_id):
             else:
                 expenses_str = "No expenses logged yet."
 
-            # 🔥 Improved Prompt
             prompt = f"""
-You are a helpful AI financial advisor. Answer the user's question about their finances.
+You are a helpful AI financial advisor.
 
 USER'S EXPENSE DATA:
 {expenses_str}
 
 USER'S QUESTION: {user_message}
 
-Provide a clear, practical answer in 2-4 sentences. Be specific to their data when possible.
-If they ask for general advice, relate it to their spending patterns.
+Respond ONLY in valid JSON:
+{{
+  "item": "string",
+  "cost": number,
+  "date": "YYYY-MM-DD"
+}}
 """
 
-            response = requests.post(
-                "http://localhost:11434/api/generate",
-                json={
-                    "model": "phi3",
-                    "prompt": prompt,
-                    "stream": False
-                },
-                timeout=120
-            )
+            # 🔥 TRY OLLAMA
+            try:
+                response = requests.post(
+                    "http://localhost:11434/api/generate",
+                    json={
+                        "model": "phi3",
+                        "prompt": prompt,
+                        "stream": False
+                    },
+                    timeout=10
+                )
 
-            if response.status_code == 200:
-                reply = response.json().get('response', '').strip()
-            else:
-                reply = "AI service unavailable. Please try again."
+                if response.status_code == 200:
+                    reply = response.json().get('response', '').strip()
 
-            return JsonResponse({'response': reply}, status=200)
+                    if reply:
+                        return JsonResponse({'response': reply}, status=200)
 
-        except requests.exceptions.RequestException:
-            return JsonResponse({'error': 'AI server not responding'}, status=500)
+            except Exception as e:
+                print("❌ Ollama failed:", str(e))
+
+            # 🔥 FALLBACK (IMPORTANT)
+            print("⚠️ Using fallback AI")
+
+            fallback_response = json.dumps({
+                "item": user_message.split(" ")[0] if user_message else "Expense",
+                "cost": 0,
+                "date": datetime.date.today().strftime("%Y-%m-%d")
+            })
+
+            return JsonResponse({
+                "response": fallback_response,
+                "ai": "fallback"
+            }, status=200)
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'message': 'Method not allowed'}, status=405)
-#--document upload --#
-
-import pandas as pd
 
 @csrf_exempt
 def upload_statement(request):

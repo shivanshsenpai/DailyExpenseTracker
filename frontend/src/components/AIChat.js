@@ -165,7 +165,23 @@ const AIChat = () => {
           NoteDate: expense.date
         }),
       });
-      const data = await res.json();
+      const text = await res.text();
+
+  let data;
+try {
+  data = JSON.parse(text);
+} catch (e) {
+  console.error("❌ Not JSON:", text);
+
+  const errorMessage = {
+    id: messages.length + 2,
+    text: "⚠️ AI service temporarily unavailable. Please try again later.",
+    sender: "ai",
+  };
+
+  setMessages((prev) => [...prev, errorMessage]);
+  return;
+}
       if (res.ok) {
         toast.success('Expense added successfully!');
         setMessages(prev => [...prev, {
