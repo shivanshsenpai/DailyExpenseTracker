@@ -1,14 +1,27 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useRef } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const userId = localStorage.getItem("userId");
+
+  const collapseRef = useRef(null);
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
     navigate("/");
   };
+
+  // ✅ CLOSE NAVBAR ON MOBILE CLICK
+  const closeNavbar = () => {
+    if (collapseRef.current && collapseRef.current.classList.contains("show")) {
+      collapseRef.current.classList.remove("show");
+    }
+  };
+
+  // ✅ ACTIVE LINK STYLE
+  const isActive = (path) => location.pathname === path;
 
   return (
     <nav
@@ -19,6 +32,7 @@ const Navbar = () => {
         WebkitBackdropFilter: "blur(12px)",
         borderBottom: "1px solid rgba(255,255,255,0.08)",
         zIndex: 1000,
+        transition: "all 0.4s ease",
       }}
     >
       <div className="container-fluid px-4">
@@ -26,9 +40,19 @@ const Navbar = () => {
         <Link
           className="navbar-brand fw-bold d-flex align-items-center fs-5"
           to="/"
-          style={{ color: "#fff" }}
+          onClick={closeNavbar}
+          style={{
+            color: "#fff",
+            transition: "0.3s",
+          }}
         >
-          <i className="fas fa-wallet me-2" style={{ color: "#facc15" }}></i>
+          <i
+            className="fas fa-wallet me-2"
+            style={{
+              color: "#facc15",
+              transition: "0.3s",
+            }}
+          ></i>
           Expense Tracker
         </Link>
 
@@ -38,83 +62,65 @@ const Navbar = () => {
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarContent"
+          style={{
+            filter: "invert(1)",
+            transition: "0.3s",
+          }}
         >
-          <span className="navbar-toggler-icon"></span>
+          ☰
         </button>
 
         {/* Links */}
-        <div className="collapse navbar-collapse" id="navbarContent">
+        <div
+          className="collapse navbar-collapse"
+          id="navbarContent"
+          ref={collapseRef}
+        >
           <ul className="navbar-nav ms-auto align-items-lg-center">
             <li className="nav-item">
-              <Link className="nav-link nav-hover" to="/">
+              <Link
+                className={`nav-link nav-hover ${
+                  isActive("/") ? "active-link" : ""
+                }`}
+                to="/"
+                onClick={closeNavbar}
+              >
                 Home
               </Link>
             </li>
 
             {userId ? (
               <>
-                <li className="nav-item">
-                  <Link className="nav-link nav-hover" to="/dashboard">
-                    Dashboard
-                  </Link>
-                </li>
-
-                <li className="nav-item">
-                  <Link className="nav-link nav-hover" to="/add-expense">
-                    Add Expense
-                  </Link>
-                </li>
-
-                <li className="nav-item">
-                  <Link className="nav-link nav-hover" to="/manage-expense">
-                    Manage
-                  </Link>
-                </li>
-
-                <li className="nav-item">
-                  <Link className="nav-link nav-hover" to="/expense-report">
-                    Reports
-                  </Link>
-                </li>
-
-                <li className="nav-item">
-                  <Link className="nav-link nav-hover" to="/ai-chat">
-                    AI Chat
-                  </Link>
-                </li><li className="nav-item">
-                  <Link className="nav-link nav-hover" to="/ai-suggestions">
-                    AI Suggestions
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link nav-hover" to="/stock-update">
-                    Stock Updates
-                  </Link>
-                </li>
-
-                <li className="nav-item">
-                  <Link className="nav-link nav-hover" to="/change_password">
-                    Password
-                  </Link>
-                </li>
+                {[
+                  { path: "/dashboard", name: "Dashboard" },
+                  { path: "/add-expense", name: "Add Expense" },
+                  { path: "/manage-expense", name: "Manage" },
+                  { path: "/expense-report", name: "Reports" },
+                  { path: "/ai-chat", name: "AI Chat" },
+                  { path: "/ai-suggestions", name: "AI Suggestions" },
+                  { path: "/stock-update", name: "Stock Updates" },
+                  { path: "/change_password", name: "Password" },
+                ].map((link, index) => (
+                  <li className="nav-item" key={index}>
+                    <Link
+                      className={`nav-link nav-hover ${
+                        isActive(link.path) ? "active-link" : ""
+                      }`}
+                      to={link.path}
+                      onClick={closeNavbar}
+                    >
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
 
                 <li className="nav-item ms-lg-3 mt-2 mt-lg-0">
                   <button
-                    className="btn fw-bold"
-                    onClick={handleLogout}
-                    style={{
-                      background: "#facc15",
-                      color: "#000",
-                      borderRadius: "20px",
-                      padding: "6px 16px",
-                      transition: "0.3s",
+                    className="btn fw-bold logout-btn"
+                    onClick={() => {
+                      closeNavbar();
+                      handleLogout();
                     }}
-                    onMouseEnter={(e) =>
-                      (e.target.style.transform = "scale(1.05)")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.target.style.transform = "scale(1)")
-                    }
                   >
                     Logout
                   </button>
@@ -123,7 +129,11 @@ const Navbar = () => {
             ) : (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link nav-hover" to="/login">
+                  <Link
+                    className="nav-link nav-hover"
+                    to="/login"
+                    onClick={closeNavbar}
+                  >
                     Sign In
                   </Link>
                 </li>
@@ -131,13 +141,8 @@ const Navbar = () => {
                 <li className="nav-item ms-lg-2">
                   <Link
                     to="/signup"
-                    className="btn fw-bold"
-                    style={{
-                      background: "#facc15",
-                      color: "#000",
-                      borderRadius: "20px",
-                      padding: "6px 16px",
-                    }}
+                    onClick={closeNavbar}
+                    className="btn fw-bold signup-btn"
                   >
                     Sign Up
                   </Link>
@@ -148,18 +153,25 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* 🔥 Styles */}
+      {/* 🔥 STYLES */}
       <style>
         {`
           .nav-link {
             color: #ccc !important;
-            margin: 0 6px;
-            transition: 0.3s;
+            margin: 0 8px;
+            transition: all 0.3s ease;
             position: relative;
           }
 
           .nav-link:hover {
             color: #facc15 !important;
+            transform: translateY(-2px);
+          }
+
+          /* ACTIVE LINK */
+          .active-link {
+            color: #facc15 !important;
+            font-weight: 600;
           }
 
           /* ✨ underline animation */
@@ -170,12 +182,44 @@ const Navbar = () => {
             bottom: -4px;
             width: 0%;
             height: 2px;
-            background: #facc15;
+            background: linear-gradient(90deg, #facc15, #f59e0b);
             transition: 0.3s;
           }
 
           .nav-hover:hover::after {
             width: 100%;
+          }
+
+          /* 🔥 BUTTONS */
+          .logout-btn {
+            background: linear-gradient(135deg, #facc15, #f59e0b);
+            color: #000;
+            border-radius: 20px;
+            padding: 6px 16px;
+            transition: all 0.3s ease;
+          }
+
+          .logout-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 15px rgba(250,204,21,0.5);
+          }
+
+          .signup-btn {
+            background: linear-gradient(135deg, #facc15, #f59e0b);
+            color: #000;
+            border-radius: 20px;
+            padding: 6px 16px;
+            transition: all 0.3s ease;
+          }
+
+          .signup-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 15px rgba(250,204,21,0.5);
+          }
+
+          /* 🔥 NAVBAR OPEN ANIMATION */
+          .navbar-collapse {
+            transition: all 0.4s ease;
           }
         `}
       </style>
