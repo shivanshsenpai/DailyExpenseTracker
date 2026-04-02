@@ -475,9 +475,9 @@ def add_multiple_expenses(request):
             # ✅ SAFE DATE
             expense_date = item.get("NoteDate")
             try:
-                expense_date = datetime.strptime(expense_date, "%Y-%m-%d").date()
+                expense_date = datetime.datetime.strptime(expense_date, "%Y-%m-%d").date()
             except:
-                expense_date = datetime.today().date()
+                expense_date = datetime.datetime.today().date()
 
             Expense.objects.create(
                 ExpenseItem=item.get("ExpenseItem", "").strip(),
