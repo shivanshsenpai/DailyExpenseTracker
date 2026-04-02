@@ -34,7 +34,7 @@ const ExpenseReport = () => {
 
   const fetchExpenses = async () => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/expenses/${userId}/`);
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/manage_expense/${userId}/`);
       const data = await res.json();
       setExpenses(data);
     } catch {
