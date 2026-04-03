@@ -59,33 +59,62 @@ const AdminDashboard = () => {
   };
 
   // ✏️ Edit user
-  const handleEditUser = async (id) => {
-    const newName = prompt("Enter new name:");
-    if (!newName) return;
+ const handleEditUser = async (id) => {
+  const newName = prompt("Enter new name:");
+  if (!newName) return;
 
-    await fetch(
-      `${process.env.REACT_APP_API_URL}/update-user/${id}/`,
+  try {
+    const res = await fetch(
+      `${process.env.REACT_APP_API_URL}/update-user/`,
       {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ FullName: newName }),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: id,
+          fullName: newName,
+        }),
       }
     );
 
-    fetchAdminData();
-  };
+    if (res.ok) {
+      fetchAdminData(); // refresh data
+    } else {
+      alert("Update failed");
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   // ❌ Delete user
   const handleDeleteUser = async (id) => {
-    if (!window.confirm("Delete this user?")) return;
+  if (!window.confirm("Delete this user?")) return;
 
-    await fetch(
-      `${process.env.REACT_APP_API_URL}/delete-user/${id}/`,
-      { method: "DELETE" }
+  try {
+    const res = await fetch(
+      `${process.env.REACT_APP_API_URL}/delete-user/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: id,
+        }),
+      }
     );
 
-    fetchAdminData();
-  };
+    if (res.ok) {
+      fetchAdminData();
+    } else {
+      alert("Delete failed");
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   // 📊 Stats
   const totalUsers = users.length;

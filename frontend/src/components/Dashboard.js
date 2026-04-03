@@ -63,6 +63,7 @@ const Dashboard = () => {
     date: e.ExpenseDate || `Day ${i + 1}`,
     amount: parseFloat(e.ExpenseCost) || 0,
   }));
+  
 
   return (
     <div

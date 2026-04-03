@@ -104,6 +104,32 @@ def admin_data(request):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+    #admin user edit and delete
+@csrf_exempt
+def update_user(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        user_id = data.get("userId")
+        full_name = data.get("fullName")
+
+        user = UserDetail.objects.get(id=user_id)
+        user.FullName = full_name
+        user.save()
+
+        return JsonResponse({"message": "updated"}, status=200)
+    
+@csrf_exempt
+def delete_user(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        user_id = data.get("userId")
+
+        user = UserDetail.objects.get(id=user_id)
+        user.delete()
+
+        return JsonResponse({"message": "deleted"}, status=200)
 # ---------------- EXPENSE CRUD ---------------- #
 
 @csrf_exempt

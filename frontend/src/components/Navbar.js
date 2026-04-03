@@ -8,7 +8,7 @@ const Navbar = () => {
   const isAdmin = localStorage.getItem("isAdmin") === "true";
 
   const collapseRef = useRef(null);
-
+  
   const handleLogout = () => {
     localStorage.removeItem("userId");
     localStorage.removeItem("isAdmin");
