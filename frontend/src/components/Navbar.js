@@ -5,22 +5,24 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const userId = localStorage.getItem("userId");
+  const isAdmin = localStorage.getItem("isAdmin") === "true";
 
   const collapseRef = useRef(null);
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
+    localStorage.removeItem("isAdmin");
     navigate("/");
   };
 
-  // ✅ CLOSE NAVBAR ON MOBILE CLICK
+  // CLOSE NAVBAR ON MOBILE CLICK
   const closeNavbar = () => {
     if (collapseRef.current && collapseRef.current.classList.contains("show")) {
       collapseRef.current.classList.remove("show");
     }
   };
 
-  // ✅ ACTIVE LINK STYLE
+  // ACTIVE LINK STYLE
   const isActive = (path) => location.pathname === path;
 
   return (
@@ -41,18 +43,9 @@ const Navbar = () => {
           className="navbar-brand fw-bold d-flex align-items-center fs-5"
           to="/"
           onClick={closeNavbar}
-          style={{
-            color: "#fff",
-            transition: "0.3s",
-          }}
+          style={{ color: "#fff" }}
         >
-          <i
-            className="fas fa-wallet me-2"
-            style={{
-              color: "#facc15",
-              transition: "0.3s",
-            }}
-          ></i>
+          <i className="fas fa-wallet me-2" style={{ color: "#facc15" }}></i>
           Expense Tracker
         </Link>
 
@@ -62,21 +55,19 @@ const Navbar = () => {
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarContent"
-          style={{
-            filter: "invert(1)",
-            transition: "0.3s",
-          }}
+          style={{ filter: "invert(1)" }}
         >
           ☰
         </button>
 
-        {/* Links */}
+        {/* LINKS */}
         <div
           className="collapse navbar-collapse"
           id="navbarContent"
           ref={collapseRef}
         >
           <ul className="navbar-nav ms-auto align-items-lg-center">
+            {/* HOME */}
             <li className="nav-item">
               <Link
                 className={`nav-link nav-hover ${
@@ -91,6 +82,7 @@ const Navbar = () => {
 
             {userId ? (
               <>
+                {/* USER LINKS */}
                 {[
                   { path: "/dashboard", name: "Dashboard" },
                   { path: "/add-expense", name: "Add Expense" },
@@ -114,6 +106,22 @@ const Navbar = () => {
                   </li>
                 ))}
 
+                {/* 👑 ADMIN BUTTON (ONLY IF ADMIN) */}
+                {isAdmin && (
+                  <li className="nav-item ms-lg-2">
+                    <button
+                      className="btn fw-bold admin-btn"
+                      onClick={() => {
+                        closeNavbar();
+                        navigate("/admin-dashboard");
+                      }}
+                    >
+                      👑 Admin Panel
+                    </button>
+                  </li>
+                )}
+
+                {/* LOGOUT */}
                 <li className="nav-item ms-lg-3 mt-2 mt-lg-0">
                   <button
                     className="btn fw-bold logout-btn"
@@ -128,6 +136,7 @@ const Navbar = () => {
               </>
             ) : (
               <>
+                {/* AUTH */}
                 <li className="nav-item">
                   <Link
                     className="nav-link nav-hover"
@@ -153,7 +162,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* 🔥 STYLES */}
+      {/* STYLES */}
       <style>
         {`
           .nav-link {
@@ -168,13 +177,11 @@ const Navbar = () => {
             transform: translateY(-2px);
           }
 
-          /* ACTIVE LINK */
           .active-link {
             color: #facc15 !important;
             font-weight: 600;
           }
 
-          /* ✨ underline animation */
           .nav-hover::after {
             content: "";
             position: absolute;
@@ -190,7 +197,6 @@ const Navbar = () => {
             width: 100%;
           }
 
-          /* 🔥 BUTTONS */
           .logout-btn {
             background: linear-gradient(135deg, #facc15, #f59e0b);
             color: #000;
@@ -217,7 +223,19 @@ const Navbar = () => {
             box-shadow: 0 0 15px rgba(250,204,21,0.5);
           }
 
-          /* 🔥 NAVBAR OPEN ANIMATION */
+          .admin-btn {
+            background: linear-gradient(135deg, #9333ea, #6366f1);
+            color: #fff;
+            border-radius: 20px;
+            padding: 6px 16px;
+            transition: all 0.3s ease;
+          }
+
+          .admin-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 15px rgba(147, 51, 234, 0.5);
+          }
+
           .navbar-collapse {
             transition: all 0.4s ease;
           }
